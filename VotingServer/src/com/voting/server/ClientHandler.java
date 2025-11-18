@@ -1,3 +1,7 @@
+/*A Runnable class, responsible for handling communication with a single client in its own thread. 
+It sends the election details, receives the vote, performs server-side validation (including CPF and
+duplicate checks via VotingServer), sends the result back to the client, and closes the connection.*/
+
 package com.voting.server;
 
 import com.voting.common.CPFValidator;

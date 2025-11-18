@@ -1,3 +1,7 @@
+/*Manages all network communication for the client application. It handles establishing 
+the Socket connection, setting up Object streams, receiving the initial VotingPacket, and 
+sending the Vote object while awaiting a response from the server.*/
+
 package com.voting.client;
 
 import com.voting.common.Vote;

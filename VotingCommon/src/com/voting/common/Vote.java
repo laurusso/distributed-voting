@@ -1,3 +1,6 @@
+/*Data model representing a single vote cast by an elector. It contains the elector's 
+CPF and the index of the selected option. Implements Serializable to allow transfer over network object streams.*/
+
 package com.voting.common;
 
 import java.io.Serializable;

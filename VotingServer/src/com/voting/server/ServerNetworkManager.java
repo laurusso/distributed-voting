@@ -1,3 +1,6 @@
+/*Manages the server-side network infrastructure. It runs in a separate thread, 
+initializes the ServerSocket, and continuously accepts new client connections. 
+For every connection, it delegates the communication to a new ClientHandler thread*/
 package com.voting.server;
 
 import java.io.IOException;

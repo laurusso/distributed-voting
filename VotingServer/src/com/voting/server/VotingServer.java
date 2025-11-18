@@ -1,3 +1,6 @@
+/*The core logic component of the election server. It maintains the election state, 
+including the VotingPacket and the map of received votes (using CPF as key to enforce uniqueness). 
+It processes new votes and notifies the ServerGUI of result updates.*/
 package com.voting.server;
 
 import com.voting.common.Vote;

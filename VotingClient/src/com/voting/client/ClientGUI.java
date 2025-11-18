@@ -1,3 +1,6 @@
+/*The main client application Graphical User Interface (GUI), responsible for user 
+interaction: collecting server connection details, displaying the voting options 
+received in the VotingPacket, validating the local CPF, and initiating the vote submission process.*/
 package com.voting.client;
 
 import com.voting.common.CPFValidator;

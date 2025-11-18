@@ -1,3 +1,7 @@
+/*The administrative GUI for the server. It allows the user to configure the election, 
+start the listening network process, display real-time server logs and partial results,
+and generate a final report upon election conclusion.*/
+
 package com.voting.server;
 
 import com.voting.common.Vote;

@@ -1,3 +1,6 @@
+/*Data model used to encapsulate the election details (the question and the list of options) 
+sent from the server to the client upon initial connection. Implements Serializable.*/
+
 package com.voting.common;
 
 import java.io.Serializable;

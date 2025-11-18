@@ -1,3 +1,6 @@
+/*Utility class for static methods to validate the Brazilian CPF
+number format and its check digits. Used for ensuring data integrity on both client and server sides.*/
+
 package com.voting.common;
 
 public class CPFValidator {
