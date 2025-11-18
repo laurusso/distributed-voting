@@ -1,3 +1,5 @@
+package com.voting.server;
+
 import com.voting.common.Vote;
 import com.voting.common.VotingPacket;
 import java.util.Map;

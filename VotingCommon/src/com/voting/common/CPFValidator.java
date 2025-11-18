@@ -1,3 +1,5 @@
+package com.voting.common;
+
 public class CPFValidator {
     public static boolean isValidCPF(String cpf) {
         //removes everything escept for numbers

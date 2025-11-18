@@ -1,5 +1,6 @@
 package com.voting.client;
 
+import com.voting.common.CPFValidator;
 import com.voting.common.Vote;
 import com.voting.common.VotingPacket;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class ClientGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         
+        //menu bar
         JMenuBar menuBar = new JMenuBar();
         
         JMenu helpMenu = new JMenu("Ajuda");
@@ -49,19 +51,39 @@ public class ClientGUI extends JFrame {
 
         aboutItem.addActionListener((e) -> {
             JOptionPane.showMessageDialog(this,
-                "Cliente de Votação Distribuída\nVersão 1.0",
-                "Sobre",
-                JOptionPane.INFORMATION_MESSAGE);
+                "Projeto Votação Distribuída em Java - SI400B\n\n" +
+                "Esta aplicação representa um sistema de votação eletrônica distribuída, " +
+                "desenvolvido com o objetivo de aplicar e demonstrar conceitos de sistemas " +
+                "distribuídos e comunicação de rede.\n\n" +
+
+                "Arquitetura:\n" +
+                "O sistema opera sob o modelo Cliente-Servidor, utilizando o protocolo TCP/IP " +
+                "para garantir a comunicação confiável. A troca de informações (pacotes de " +
+                "votação e votos) é realizada através de fluxos de objetos (Object Streams).\n\n" +
+
+                "Funcionalidades Principais:\n" +
+                "- Servidor Multithread: O servidor é implementado com multithreading para " +
+                "gerenciar e atender a múltiplas conexões de clientes simultaneamente, " +
+                "garantindo eficiência.\n" +
+                "- Segurança e Integridade: O sistema valida o CPF do eleitor e implementa " +
+                "mecanismos no servidor para prevenir a duplicação de votos, assegurando a " +
+                "integridade da eleição.\n" +
+                "- Monitoramento em Tempo Real: O servidor acompanha e exibe os resultados " +
+                "parciais da votação em tempo real, além de gerar um relatório final.\n\n" +
+
+                "O projeto foca na segurança, integridade e facilidade de uso em uma solução " +
+                "prática de votação eletrônica.",
+                "Sobre", JOptionPane.INFORMATION_MESSAGE);
         });
 
         creditsItem.addActionListener((e) -> {
             JOptionPane.showMessageDialog(this,
-                "Desenvolvido por:\n Guilherme Freitas Costa 235946\nLaura Rodrigues Russo 235826\nLucas de Oliveira Lopes Cardoso 269538\nMaria Clara Marsola Paulini 219443\nWesley Henrique Batista Sant'Anna 284045\nDisciplina: SI400B",
+                "Desenvolvido por:\nGuilherme Freitas Costa 235946\nLaura Rodrigues Russo 235826\nLucas de Oliveira Lopes Cardoso 269538\nMaria Clara Marsola Paulini 219443\nWesley Henrique Batista Sant'Anna 284045\nDisciplina: SI400B",
                 "Créditos",
                 JOptionPane.INFORMATION_MESSAGE);
         });
 
-        //conection section
+        //connection section
         add(new JLabel("IP Servidor:")).setBounds(10, 10, 80, 25);
         txtIpServer = new JTextField("127.0.0.1"); // "127.0.0.1" - dafault
         txtIpServer.setBounds(90, 10, 100, 25);
@@ -167,23 +189,33 @@ public class ClientGUI extends JFrame {
         lblStatus.setText("Status: Enviando voto...");
         setVotingEnabled(false);
 
+        lblStatus.setText("Status: Enviando voto...");
+        setVotingEnabled(false);
+
         new Thread(() -> {
             try {
-                //create object Vote
                 Vote vote = new Vote(cpf, selectedIndex);
 
-                //send vote 
-                networkManager.sendVote(vote);
+                // send vote and receive status message
+                String serverResponse = networkManager.sendVote(vote); 
 
-                //update GUI
                 SwingUtilities.invokeLater(() -> {
-                    lblStatus.setText("Status: Voto enviado com sucesso! Desconectado.");
-                    btnVote.setEnabled(false);
+                    //process the answer
+                    if (serverResponse.equalsIgnoreCase("SUCESSO")) {
+                        lblStatus.setText("Status: Voto enviado com sucesso! Desconectado.");
+                        btnVote.setEnabled(false);
+                    } else if (serverResponse.contains("DUPLICADO")) {
+                        lblStatus.setText("Status: Erro! CPF já votou.");
+                        setVotingEnabled(true);
+                    } else {
+                        lblStatus.setText("Status: Erro do servidor: " + serverResponse);
+                        setVotingEnabled(true);
+                    }
                 });
 
             } catch (IOException ex) {
                 SwingUtilities.invokeLater(() -> {
-                    lblStatus.setText("Erro ao enviar voto: " + ex.getMessage());
+                    lblStatus.setText("Erro de Conexão/Rede: " + ex.getMessage());
                     setVotingEnabled(true);
                 });
             }

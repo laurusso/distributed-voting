@@ -1,15 +1,5 @@
 package com.voting.client;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author l235826
- */
-
 import com.voting.common.Vote;
 import com.voting.common.VotingPacket;
 import java.io.IOException;
@@ -17,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-/*Manages the client applicatons*/
+/*manages the client applicatons*/
 public class ClientNetworkManager {
 
     private Socket socket;
@@ -37,17 +27,28 @@ public class ClientNetworkManager {
         return packet;
     }
 
-    public void sendVote(Vote vote) throws IOException {
+    public String sendVote(Vote vote) throws IOException {
         if (out == null || socket == null || socket.isClosed()) {
             throw new IOException("Não está conectado ao servidor.");
         }
         
         try {
-            //sends voting
+            //send vote
             out.writeObject(vote);
             out.flush();
+
+            //wait the server
+            Object response = in.readObject(); 
+            if (response instanceof String) {
+                return (String) response; 
+            } else {
+                throw new IOException("Resposta do servidor em formato inesperado.");
+            }
+
+        } catch (ClassNotFoundException ex) {
+             throw new IOException("Erro ao ler resposta do servidor: " + ex.getMessage());
         } finally {
-            //shut everything 
+            //shut down
             if (out != null) out.close();
             if (in != null) in.close();
             if (socket != null) socket.close();

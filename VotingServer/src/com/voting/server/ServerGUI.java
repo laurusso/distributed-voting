@@ -1,3 +1,5 @@
+package com.voting.server;
+
 import com.voting.common.Vote;
 import com.voting.common.VotingPacket;
 import java.awt.BorderLayout;
@@ -45,15 +47,41 @@ public class ServerGUI extends JFrame {
         //menu bar
         JMenuBar menuBar = new JMenuBar();
         JMenu helpMenu = new JMenu("Ajuda");
-        JMenuItem aboutItem = new JMenuItem("Sobre...");
+        JMenuItem aboutItem = new JMenuItem("Sobre");
         JMenuItem creditsItem = new JMenuItem("Créditos");
         helpMenu.add(aboutItem);
         helpMenu.add(creditsItem);
         menuBar.add(helpMenu);
         setJMenuBar(menuBar);
-        aboutItem.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Servidor de Votação...", "Sobre", JOptionPane.INFORMATION_MESSAGE));
+        aboutItem.addActionListener((e) -> {
+            JOptionPane.showMessageDialog(this,
+                "Projeto Votação Distribuída em Java - SI400B\n\n" +
+                "Esta aplicação representa um sistema de votação eletrônica distribuída, " +
+                "desenvolvido com o objetivo de aplicar e demonstrar conceitos de sistemas " +
+                "distribuídos e comunicação de rede.\n\n" +
+
+                "Arquitetura:\n" +
+                "O sistema opera sob o modelo Cliente-Servidor, utilizando o protocolo TCP/IP " +
+                "para garantir a comunicação confiável. A troca de informações (pacotes de " +
+                "votação e votos) é realizada através de fluxos de objetos (Object Streams).\n\n" +
+
+                "Funcionalidades Principais:\n" +
+                "- Servidor Multithread: O servidor é implementado com multithreading para " +
+                "gerenciar e atender a múltiplas conexões de clientes simultaneamente, " +
+                "garantindo eficiência.\n" +
+                "- Segurança e Integridade: O sistema valida o CPF do eleitor e implementa " +
+                "mecanismos no servidor para prevenir a duplicação de votos, assegurando a " +
+                "integridade da eleição.\n" +
+                "- Monitoramento em Tempo Real: O servidor acompanha e exibe os resultados " +
+                "parciais da votação em tempo real, além de gerar um relatório final.\n\n" +
+
+                "O projeto foca na segurança, integridade e facilidade de uso em uma solução " +
+                "prática de votação eletrônica.",
+
+                "Sobre", JOptionPane.INFORMATION_MESSAGE);
+        });
         creditsItem.addActionListener((e) -> JOptionPane.showMessageDialog(this, 
-                "Desenvolvido por:\n Guilherme Freitas Costa 235946\nLaura Rodrigues Russo 235826\nLucas de Oliveira Lopes Cardoso 269538\nMaria Clara Marsola Paulini 219443\nWesley Henrique Batista Sant'Anna 284045\nDisciplina: SI400B", 
+                "Desenvolvido por:\nGuilherme Freitas Costa 235946\nLaura Rodrigues Russo 235826\nLucas de Oliveira Lopes Cardoso 269538\nMaria Clara Marsola Paulini 219443\nWesley Henrique Batista Sant'Anna 284045\nDisciplina: SI400B", 
                 "Créditos", JOptionPane.INFORMATION_MESSAGE));
         
         //config panel
