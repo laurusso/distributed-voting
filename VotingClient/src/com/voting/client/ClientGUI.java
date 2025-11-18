@@ -1,12 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-
-/**
- *
- * @author l235826
- */
 package com.voting.client;
 
 import com.voting.common.Vote;
@@ -16,42 +7,34 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
-import javax.swing.*; // Importa todos os componentes Swing
+import javax.swing.*; 
 import java.awt.event.ActionEvent;
 
-/**
- * Interface Gráfica (GUI) principal do Cliente.
- * Usamos JFrame para criar a janela.
- */
+/*Client GUI - interface */
 public class ClientGUI extends JFrame {
 
-    // --- Componentes da GUI ---
-    private JTextField txtIpServidor;
-    private JTextField txtPorta;
-    private JButton btnConectar;
+    //components
+    private JTextField txtIpServer;
+    private JTextField txtPort;
+    private JButton btnConnect;
     
-    private JLabel lblPergunta;
-    private JComboBox<String> comboOpcoes; // Dropdown para as opções
+    private JLabel lblQuestion;
+    private JComboBox<String> optionsSelect; 
     private JTextField txtCpf;
-    private JButton btnVotar;
+    private JButton btnVote;
     
     private JLabel lblStatus;
 
-    // --- Componentes de Rede ---
     private ClientNetworkManager networkManager;
-    private VotingPacket votingPacket; // Pacote recebido do servidor
+    private VotingPacket votingPacket; 
 
-    /**
-     * Construtor
-     */
+
     public ClientGUI() {
-        // Configurações básicas da janela
         setTitle("Cliente de Votacao");
-        setSize(450, 400); // Largura x Altura
+        setSize(450, 400); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(null); // Layout manual (mais simples para este exemplo)
+        setLayout(null);
         
-        // --- NOVO: Barra de Menu ---
         JMenuBar menuBar = new JMenuBar();
         
         JMenu helpMenu = new JMenu("Ajuda");
@@ -62,10 +45,8 @@ public class ClientGUI extends JFrame {
         helpMenu.add(creditsItem);
         menuBar.add(helpMenu);
         
-        // Define a barra de menu para esta janela
         setJMenuBar(menuBar);
 
-        // Ação do item "Sobre"
         aboutItem.addActionListener((e) -> {
             JOptionPane.showMessageDialog(this,
                 "Cliente de Votação Distribuída\nVersão 1.0",
@@ -73,93 +54,82 @@ public class ClientGUI extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE);
         });
 
-        // Ação do item "Créditos"
         creditsItem.addActionListener((e) -> {
             JOptionPane.showMessageDialog(this,
                 "Desenvolvido por:\n Guilherme Freitas Costa 235946\nLaura Rodrigues Russo 235826\nLucas de Oliveira Lopes Cardoso 269538\nMaria Clara Marsola Paulini 219443\nWesley Henrique Batista Sant'Anna 284045\nDisciplina: SI400B",
                 "Créditos",
                 JOptionPane.INFORMATION_MESSAGE);
         });
-        // --- FIM DA Barra de Menu ---
 
-        // --- Seção de Conexão ---
+        //conection section
         add(new JLabel("IP Servidor:")).setBounds(10, 10, 80, 25);
-        txtIpServidor = new JTextField("127.0.0.1"); // "127.0.0.1" é o localhost (esta máquina)
-        txtIpServidor.setBounds(90, 10, 100, 25);
-        add(txtIpServidor);
+        txtIpServer = new JTextField("127.0.0.1"); // "127.0.0.1" - dafault
+        txtIpServer.setBounds(90, 10, 100, 25);
+        add(txtIpServer);
 
         add(new JLabel("Porta:")).setBounds(200, 10, 40, 25);
-        txtPorta = new JTextField("5000");
-        txtPorta.setBounds(240, 10, 60, 25);
-        add(txtPorta);
+        txtPort = new JTextField("5000");
+        txtPort.setBounds(240, 10, 60, 25);
+        add(txtPort);
 
-        btnConectar = new JButton("Conectar");
-        btnConectar.setBounds(310, 10, 100, 25);
-        add(btnConectar);
+        btnConnect = new JButton("Conectar");
+        btnConnect.setBounds(310, 10, 100, 25);
+        add(btnConnect);
 
-        // --- Seção de Votação ---
-        lblPergunta = new JLabel("Pergunta: (conecte-se para carregar)");
-        lblPergunta.setBounds(10, 50, 380, 25);
-        add(lblPergunta);
+        //voting section
+        lblQuestion = new JLabel("Pergunta: (conecte-se para carregar)");
+        lblQuestion.setBounds(10, 50, 380, 25);
+        add(lblQuestion);
         
-        comboOpcoes = new JComboBox<>();
-        comboOpcoes.setBounds(10, 80, 380, 25);
-        add(comboOpcoes);
+        optionsSelect = new JComboBox<>();
+        optionsSelect.setBounds(10, 80, 380, 25);
+        add(optionsSelect);
 
         add(new JLabel("Seu CPF:")).setBounds(10, 120, 80, 25);
         txtCpf = new JTextField();
         txtCpf.setBounds(90, 120, 150, 25);
         add(txtCpf);
 
-        btnVotar = new JButton("Votar");
-        btnVotar.setBounds(250, 120, 80, 25);
-        add(btnVotar);
+        btnVote = new JButton("Votar");
+        btnVote.setBounds(250, 120, 80, 25);
+        add(btnVote);
 
-        // --- Seção de Status ---
+        //status section
         lblStatus = new JLabel("Status: Desconectado.");
         lblStatus.setBounds(10, 280, 380, 25);
         add(lblStatus);
-
-        // --- Ações dos Botões ---
         
-        // Ação do botão Conectar
-        btnConectar.addActionListener((ActionEvent e) -> {
-            conectarAoServidor();
+        btnConnect.addActionListener((ActionEvent e) -> {
+            connectServer();
         });
 
-        // Ação do botão Votar
-        btnVotar.addActionListener((ActionEvent e) -> {
-            enviarVoto();
+        btnVote.addActionListener((ActionEvent e) -> {
+            sendVote();
         });
 
-        // Habilita/Desabilita campos no início
         setVotingEnabled(false);
     }
 
-    /**
-     * Tenta se conectar ao servidor.
-     * Isso deve rodar em uma thread separada para não travar a GUI.
-     */
-    private void conectarAoServidor() {
-        String ip = txtIpServidor.getText();
-        int porta = Integer.parseInt(txtPorta.getText());
+    private void connectServer() {
+        String ip = txtIpServer.getText();
+        int porta = Integer.parseInt(txtPort.getText());
 
         lblStatus.setText("Status: Conectando...");
 
-        // Cria o nosso gerenciador de rede
+        //creates the manager
         this.networkManager = new ClientNetworkManager(); 
 
         new Thread(() -> {
             try {
-                // 1. Conectar e receber o pacote (usando o "encanador")
+                //connect and receive packet
                 votingPacket = networkManager.connectAndGetPacket(ip, porta);
 
-                // 2. Atualizar a GUI
+                //update GUI
                 SwingUtilities.invokeLater(() -> {
-                    preencherDadosVotacao(votingPacket);
+                    fillVotingData(votingPacket);
                     lblStatus.setText("Status: Conectado! Pronto para votar.");
                     setVotingEnabled(true);
-                    btnConectar.setEnabled(false);
+                    btnConnect.setEnabled(false);
                 });
 
             } catch (IOException | ClassNotFoundException ex) {
@@ -170,27 +140,19 @@ public class ClientGUI extends JFrame {
         }).start();
     }
 
-    /**
-     * Preenche a GUI com os dados recebidos do servidor.
-     */
-    private void preencherDadosVotacao(VotingPacket packet) {
-        lblPergunta.setText(packet.getQuestion());
+    private void fillVotingData(VotingPacket packet) {
+        lblQuestion.setText(packet.getQuestion());
         
-        // Limpa opções antigas e adiciona as novas
-        comboOpcoes.removeAllItems();
+        optionsSelect.removeAllItems();
         List<String> options = packet.getOptions();
         for (String option : options) {
-            comboOpcoes.addItem(option);
+            optionsSelect.addItem(option);
         }
     }
     
-    /**
-     * Tenta enviar o voto para o servidor.
-     * Isso também deve rodar em uma thread separada.
-     */
-    private void enviarVoto() {
+    private void sendVote() {
         String cpf = txtCpf.getText();
-        int selectedIndex = comboOpcoes.getSelectedIndex();
+        int selectedIndex = optionsSelect.getSelectedIndex();
 
         if (cpf.isEmpty() || selectedIndex == -1) {
             lblStatus.setText("Status: Preencha o CPF e escolha uma opcao.");
@@ -207,16 +169,16 @@ public class ClientGUI extends JFrame {
 
         new Thread(() -> {
             try {
-                // 1. Criar o objeto de Voto
+                //create object Vote
                 Vote vote = new Vote(cpf, selectedIndex);
 
-                // 2. Enviar o voto (usando o "encanador")
+                //send vote 
                 networkManager.sendVote(vote);
 
-                // 3. Atualizar GUI
+                //update GUI
                 SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Status: Voto enviado com sucesso! Desconectado.");
-                    btnVotar.setEnabled(false);
+                    btnVote.setEnabled(false);
                 });
 
             } catch (IOException ex) {
@@ -228,20 +190,13 @@ public class ClientGUI extends JFrame {
         }).start();
     }
     
-    /**
-     * Habilita/desabilita os campos de votação.
-     */
     private void setVotingEnabled(boolean enabled) {
         txtCpf.setEnabled(enabled);
-        comboOpcoes.setEnabled(enabled);
-        btnVotar.setEnabled(enabled);
+        optionsSelect.setEnabled(enabled);
+        btnVote.setEnabled(enabled);
     }
     
-    /**
-     * Método Main para iniciar a GUI.
-     */
     public static void main(String args[]) {
-        // Roda a criação da GUI na Thread de Eventos do Swing
         SwingUtilities.invokeLater(() -> {
             new ClientGUI().setVisible(true);
         });

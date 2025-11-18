@@ -14,14 +14,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-/**
- * Esta classe implementa Runnable e será executada em uma nova
- * thread para cada cliente que se conectar. 
- */
+/*this class implements the Runnable and it executes in a new thread for each client that connects*/
+
 public class ClientHandler implements Runnable {
 
     private Socket clientSocket;
-    private VotingServer server; // Referência ao servidor principal
+    private VotingServer server; 
 
     public ClientHandler(Socket socket, VotingServer server) {
         this.clientSocket = socket;
@@ -30,42 +28,33 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        // Usamos try-with-resources para garantir que tudo (streams e socket)
-        // seja fechado automaticamente no final.
         try (
             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())
         ) {
-            // 1. Enviar o pacote de votação para o cliente
+            //send the voting packet to the client
             out.writeObject(server.getCurrentVotingPacket());
             out.flush();
 
-            // 2. Esperar para receber o voto do cliente
+            //wait the vote from client
             Vote receivedVote = (Vote) in.readObject();
 
-            // --- NOVA VALIDAÇÃO ---
-            // 3. Validar o CPF no lado do Servidor
+            //cpf validator - server side 
             if (!CPFValidator.isValidCPF(receivedVote.getCpf())) {
-                // Se for inválido, nós simplesmente ignoramos o voto
-                // e fechamos a conexão. Não registramos nada.
-                // (Numa versão robusta, enviaríamos uma msg de erro ao cliente)
                 System.err.println("Voto com CPF invalido recusado: " + receivedVote.getCpf());
-                return; // Sai do método run(), fechando a conexão
+                return;
             }
-            // --- FIM DA MODIFICAÇÃO ---
 
-            // 3. Validar e registrar o voto (incluindo duplicidade) 
+            //validates and register voting
             server.registerVote(receivedVote);
-            
-            // (Numa versão mais robusta, enviaríamos uma confirmação ao cliente)
 
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Erro no handler do cliente: " + e.getMessage());
         } finally {
             try {
-                clientSocket.close(); // Garante que o socket seja fechado
+                clientSocket.close();
             } catch (IOException e) {
-                // ignora
+ 
             }
         }
     }

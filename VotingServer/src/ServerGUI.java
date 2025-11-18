@@ -1,30 +1,27 @@
-// Delele a linha 'package' se você estiver no <default package>
-
 import com.voting.common.Vote;
 import com.voting.common.VotingPacket;
 import java.awt.BorderLayout;
-import java.awt.Dimension; // Import necessário
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList; // Import necessário
-import java.util.Collections; // Import necessário
-import java.util.List; // Import necessário
+import java.util.ArrayList;
+import java.util.Collections; 
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder; // Import necessário
+import javax.swing.border.TitledBorder; 
 
 public class ServerGUI extends JFrame {
 
-    // --- Componentes de Log/Resultado ---
+    //components
     private JTextArea logArea;
-    private DefaultListModel<String> listModelResultados;
-    private JList<String> listResultados;
+    private DefaultListModel<String> listModelResults;
+    private JList<String> listResults;
     
-    // --- Componentes de Configuração (NOVOS) ---
     private JPanel configPanel;
     private JTextField txtQuestion;
     private JTextField txtNewOption;
@@ -33,23 +30,19 @@ public class ServerGUI extends JFrame {
     private DefaultListModel<String> listModelOptions;
     private JList<String> listOptions;
 
-    // --- Botão de Controle ---
+    //control button
     private JButton btnEndElection;
 
-    // --- Módulos Lógicos ---
     private VotingServer serverCore;
     private ServerNetworkManager networkManager;
 
-    /**
-     * Construtor da GUI
-     */
     public ServerGUI() {
         setTitle("Servidor de Votação");
-        setSize(700, 600); // Aumentei a altura
+        setSize(700, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // --- Barra de Menu ---
+        //menu bar
         JMenuBar menuBar = new JMenuBar();
         JMenu helpMenu = new JMenu("Ajuda");
         JMenuItem aboutItem = new JMenuItem("Sobre...");
@@ -63,22 +56,22 @@ public class ServerGUI extends JFrame {
                 "Desenvolvido por:\n Guilherme Freitas Costa 235946\nLaura Rodrigues Russo 235826\nLucas de Oliveira Lopes Cardoso 269538\nMaria Clara Marsola Paulini 219443\nWesley Henrique Batista Sant'Anna 284045\nDisciplina: SI400B", 
                 "Créditos", JOptionPane.INFORMATION_MESSAGE));
         
-        // --- NOVO PAINEL DE CONFIGURAÇÃO (Topo) ---
+        //config panel
         configPanel = new JPanel(new BorderLayout(10, 10));
         configPanel.setBorder(new TitledBorder(new EmptyBorder(10, 10, 10, 10), "Configuração da Eleição"));
         
-        // Campo da Pergunta
-        txtQuestion = new JTextField("Qual sua linguagem favorita?");
+        //question area
+        txtQuestion = new JTextField("Qual sua linguagem favorita?"); //default question
         configPanel.add(txtQuestion, BorderLayout.NORTH);
         
-        // Lista de Opções Adicionadas
+        //options list
         listModelOptions = new DefaultListModel<>();
         listOptions = new JList<>(listModelOptions);
         JScrollPane optionsScrollPane = new JScrollPane(listOptions);
-        optionsScrollPane.setPreferredSize(new Dimension(200, 100)); // Tamanho da lista
+        optionsScrollPane.setPreferredSize(new Dimension(200, 100));
         configPanel.add(optionsScrollPane, BorderLayout.CENTER);
         
-        // Painel para adicionar opções
+        //add options panel
         JPanel addPanel = new JPanel(new BorderLayout());
         txtNewOption = new JTextField();
         btnAddOption = new JButton("Adicionar Opção");
@@ -86,14 +79,14 @@ public class ServerGUI extends JFrame {
         addPanel.add(btnAddOption, BorderLayout.EAST);
         configPanel.add(addPanel, BorderLayout.SOUTH);
         
-        // Botão para INICIAR
+        //start button
         btnStartElection = new JButton("INICIAR ELEIÇÃO");
         btnStartElection.setFont(new Font("SansSerif", Font.BOLD, 14));
         configPanel.add(btnStartElection, BorderLayout.EAST);
 
-        add(configPanel, BorderLayout.NORTH); // Adiciona o painel de config no topo
+        add(configPanel, BorderLayout.NORTH);
 
-        // --- Painel de Log e Resultados (Centro) ---
+        //log panel and results
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.6); 
         JPanel logPanel = new JPanel(new BorderLayout());
@@ -107,24 +100,23 @@ public class ServerGUI extends JFrame {
         JPanel resultsPanel = new JPanel(new BorderLayout());
         resultsPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); 
         resultsPanel.add(new JLabel("Resultados Parciais:"), BorderLayout.NORTH);
-        listModelResultados = new DefaultListModel<>();
-        listResultados = new JList<>(listModelResultados);
-        JScrollPane resultsScrollPane = new JScrollPane(listResultados);
+        listModelResults = new DefaultListModel<>();
+        listResults = new JList<>(listModelResults);
+        JScrollPane resultsScrollPane = new JScrollPane(listResults);
         resultsPanel.add(resultsScrollPane, BorderLayout.CENTER);
         splitPane.setLeftComponent(logPanel);
         splitPane.setRightComponent(resultsPanel);
         
-        add(splitPane, BorderLayout.CENTER); // Adiciona o painel de log/resultado no centro
+        add(splitPane, BorderLayout.CENTER);
 
-        // --- Painel de Botões (Sul) ---
+        //buttons panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); 
         btnEndElection = new JButton("Encerrar e Salvar Relatório");
-        btnEndElection.setEnabled(false); // Desabilitado no início
+        btnEndElection.setEnabled(false);
         buttonPanel.add(btnEndElection);
         
-        add(buttonPanel, BorderLayout.SOUTH); // Adiciona o painel de encerrar no final
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        // --- AÇÕES ---
         btnAddOption.addActionListener((e) -> {
             String newOption = txtNewOption.getText().trim();
             if (!newOption.isEmpty()) {
@@ -144,9 +136,6 @@ public class ServerGUI extends JFrame {
         addLogMessage("--- Servidor pronto. Configure a eleição e clique em 'Iniciar'. ---");
     }
 
-    /**
-     * NOVO MÉTODO: Inicia o servidor com os dados da GUI.
-     */
     private void startElection() {
         String question = txtQuestion.getText().trim();
         if (question.isEmpty()) {
@@ -159,28 +148,23 @@ public class ServerGUI extends JFrame {
             return;
         }
 
-        // Converte o modelo da lista em uma List<String>
         List<String> options = Collections.list(listModelOptions.elements());
         
-        // Cria o pacote de eleição
+        //creates voting packet
         VotingPacket packet = new VotingPacket(question, options);
         
-        // Inicia o "cérebro" e a "rede"
         this.serverCore = new VotingServer(this, packet);
         this.networkManager = new ServerNetworkManager(this.serverCore, this);
         
-        // Inicia a thread de rede
+        //network thread
         new Thread(this.networkManager).start();
         
-        // Atualiza a GUI
-        setElectionState(true); // Bloqueia a config, habilita o encerramento
+        //update GUI
+        setElectionState(true); 
     }
 
-    /**
-     * Ação do botão "Encerrar e Salvar Relatório"
-     */
     private void endElection() {
-        addLogMessage("--- Votação Encerrada. ---");
+        addLogMessage("--- Votação Encerrada ---");
 
         if (networkManager != null) {
             networkManager.stopListening();
@@ -193,15 +177,12 @@ public class ServerGUI extends JFrame {
             saveReportToFile(reportContent);
         }
         
-        // Reseta a GUI
+        //reset GUI
         setElectionState(false);
-        listModelOptions.clear(); // Limpa as opções antigas
-        listModelResultados.clear(); // Limpa os resultados antigos
+        listModelOptions.clear();
+        listModelResults.clear();
     }
     
-    /**
-     * NOVO MÉTODO: Habilita/desabilita os painéis de controle
-     */
     private void setElectionState(boolean isRunning) {
         configPanel.setEnabled(!isRunning);
         txtQuestion.setEnabled(!isRunning);
@@ -213,10 +194,7 @@ public class ServerGUI extends JFrame {
         btnEndElection.setEnabled(isRunning);
     }
     
-    //
-    // --- Métodos de Relatório e Log (sem modificações) ---
-    //
-    
+    //voting report
     private String generateReport(VotingPacket packet, Map<String, Vote> votes) {
         StringBuilder report = new StringBuilder();
         report.append("--- Relatório Final da Votação ---\n\n");
@@ -242,6 +220,7 @@ public class ServerGUI extends JFrame {
         return report.toString();
     }
     
+    //voting report as txt
     private void saveReportToFile(String reportContent) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Salvar Relatório");
@@ -281,18 +260,15 @@ public class ServerGUI extends JFrame {
             }
         }
         SwingUtilities.invokeLater(() -> {
-            listModelResultados.clear();
+            listModelResults.clear();
             for (int i = 0; i < options.size(); i++) {
                 String optionName = options.get(i);
                 int count = contagem[i];
-                listModelResultados.addElement(optionName + ": " + count + " voto(s)");
+                listModelResults.addElement(optionName + ": " + count + " voto(s)");
             }
         });
     }
 
-    /**
-     * MÉTODO MAIN - PONTO DE PARTIDA
-     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             ServerGUI gui = new ServerGUI();
